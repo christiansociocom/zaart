@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-body);
+    background-color: #fdf6ec; /* cream */
+    color: #3d2b1a;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-wood-600 hover:bg-wood-700 active:bg-wood-800
+           text-white font-semibold rounded-2xl px-7 py-4 text-base
+           transition-all duration-200 shadow-md hover:shadow-lg
+           focus:outline-none focus:ring-4 focus:ring-wood-300;
+  }
+  .btn-whatsapp {
+    @apply inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1db954] active:bg-[#179a42]
+           text-white font-semibold rounded-2xl px-7 py-4 text-base
+           transition-all duration-200 shadow-md hover:shadow-lg
+           focus:outline-none focus:ring-4 focus:ring-green-300;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-wood-600 text-wood-700
+           hover:bg-wood-600 hover:text-white font-semibold rounded-2xl px-7 py-4 text-base
+           transition-all duration-200
+           focus:outline-none focus:ring-4 focus:ring-wood-300;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden;
+  }
+  .section-heading {
+    @apply font-display text-3xl md:text-4xl font-bold text-wood-900;
+  }
+  .badge {
+    @apply inline-block bg-wood-100 text-wood-700 text-xs font-semibold px-3 py-1 rounded-full;
+  }
+
+.input {
+  @apply w-full border-2 border-wood-200 rounded-xl px-4 py-3 text-wood-900
+         focus:outline-none focus:border-wood-500 focus:ring-2 focus:ring-wood-200
+         bg-white transition-all;
+}
+  
+}
