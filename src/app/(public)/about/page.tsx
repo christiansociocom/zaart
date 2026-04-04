@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'About Us – Za Art',
@@ -12,9 +11,7 @@ export default function AboutPage() {
       {/* Header */}
       <div className="text-center mb-12">
         {/* Replace /icons/about-hero.png with your own illustration */}
-        <div className="w-24 h-24 mx-auto mb-4 relative">
-          <Image src="/icons/about-hero.png" alt="Our story" fill className="object-contain" />
-        </div>
+        <div className="text-6xl mb-4" aria-hidden="true">🪵</div>
         <h1 className="section-heading mb-3">Our Story</h1>
         <p className="text-bark-600 text-lg">
           Handmade in Tanzania, with love and quality wood.
@@ -50,15 +47,12 @@ export default function AboutPage() {
       {/* Values */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-14">
         {[
-          { icon: '/icons/value-handmade.png', title: 'Handmade',    desc: 'Every piece shaped and finished by skilled hands in our workshop.' },
-          { icon: '/icons/value-wood.png',     title: 'Local Wood',  desc: 'We use quality Tanzanian timber, supporting our local forests responsibly.' },
-          { icon: '/icons/value-care.png',     title: 'Made with Care', desc: 'We take pride in every product. If you are not happy, neither are we.' },
+          { icon: '✋',   title: 'Handmade',       desc: 'Every piece shaped and finished by skilled hands in our workshop.' },
+          { icon: '🌳',   title: 'Local Wood',     desc: 'We use quality Tanzanian timber, supporting our local forests responsibly.' },
+          { icon: '❤️',   title: 'Made with Care', desc: 'We take pride in every product. If you are not happy, neither are we.' },
         ].map(v => (
           <div key={v.title} className="card p-6 text-center">
-            {/* Replace each /icons/value-*.png with your own value icons */}
-            <div className="w-16 h-16 mx-auto mb-3 relative">
-              <Image src={v.icon} alt={v.title} fill className="object-contain" />
-            </div>
+            <div className="text-4xl mb-3" aria-hidden="true">{v.icon}</div>
             <h3 className="font-display font-bold text-wood-900 text-lg mb-2">{v.title}</h3>
             <p className="text-bark-600 text-sm">{v.desc}</p>
           </div>

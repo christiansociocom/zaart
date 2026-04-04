@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { CATEGORIES } from '@/lib/db';
 import type { Product, Category } from '@/lib/db';
 import ProductCard from '@/components/ui/ProductCard';
@@ -45,8 +44,7 @@ export default function ProductsClient({ products }: Props) {
                 : 'border-wood-200 text-wood-700 hover:border-wood-500'
             }`}
           >
-            {/* Replace icon images in /public/icons/ to customise category icons */}
-            <Image src={c.icon} alt={c.label} width={18} height={18} className="object-contain" />
+          <span className="text-base" aria-hidden="true">{c.icon}</span>
             {c.label} ({counts[c.id] ?? 0})
           </button>
         ))}

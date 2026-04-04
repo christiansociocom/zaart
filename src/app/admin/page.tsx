@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getAllProducts } from '@/lib/product-queries';
 import { CATEGORIES } from '@/lib/db';
 
@@ -27,15 +26,13 @@ export default async function AdminDashboard() {
       {/* Replace /icons/stat-*.png with your own stat icons */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         {[
-          { label: 'Total Products', value: products.length, icon: '/icons/stat-products.png' },
-          { label: 'Featured',        value: featured,          icon: '/icons/stat-featured.png' },
-          { label: 'Categories',      value: CATEGORIES.length, icon: '/icons/stat-categories.png' },
-          { label: 'In Catalog',      value: products.length,   icon: '/icons/stat-catalog.png' },
+          { label: 'Total Products', value: products.length, icon: '📦' },
+          { label: 'Featured',        value: featured,          icon: '⭐' },
+          { label: 'Categories',      value: CATEGORIES.length, icon: '🗂️' },
+          { label: 'In Catalog',      value: products.length,   icon: '📋' },
         ].map(s => (
           <div key={s.label} className="card p-5 text-center">
-            <div className="w-10 h-10 mx-auto mb-1 relative">
-              <Image src={s.icon} alt={s.label} fill className="object-contain" />
-            </div>
+            <div className="text-3xl mb-1" aria-hidden="true">{s.icon}</div>
             <div className="text-3xl font-bold text-wood-800">{s.value}</div>
             <div className="text-xs text-bark-500 mt-1">{s.label}</div>
           </div>
@@ -46,9 +43,7 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-10">
         {CATEGORIES.map(c => (
           <div key={c.id} className="card p-4 text-center">
-            <div className="w-8 h-8 mx-auto mb-1 relative">
-              <Image src={c.icon} alt={c.label} fill className="object-contain" />
-            </div>
+            <div className="text-2xl mb-1" aria-hidden="true">{c.icon}</div>
             <div className="text-xl font-bold text-wood-800">{categoryCounts[c.id]}</div>
             <div className="text-xs text-bark-500">{c.label}</div>
           </div>

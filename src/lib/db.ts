@@ -27,13 +27,12 @@ export interface Product {
   updated_at: string;
 }
 
-// icon: path to an image in /public/icons/ — replace each with your own icon image
 export const CATEGORIES: { id: Category; label: string; icon: string }[] = [
-  { id: 'trays',              label: 'Trays',                icon: '/icons/trays.png' },
-  { id: 'kitchen-dining',     label: 'Kitchen & Dining',     icon: '/icons/kitchen-dining.png' },
-  { id: 'storage-organizers', label: 'Storage & Organizers', icon: '/icons/storage-organizers.png' },
-  { id: 'furniture',          label: 'Furniture',            icon: '/icons/furniture.png' },
-  { id: 'decor',              label: 'Decor',                icon: '/icons/decor.png' },
+  { id: 'trays',              label: 'Trays',                icon: '🪵' },
+  { id: 'kitchen-dining',     label: 'Kitchen & Dining',     icon: '🍽️' },
+  { id: 'storage-organizers', label: 'Storage & Organizers', icon: '📦' },
+  { id: 'furniture',          label: 'Furniture',            icon: '🪑' },
+  { id: 'decor',              label: 'Decor',                icon: '🌿' },
 ];
 
 export const WHATSAPP_NUMBER =
