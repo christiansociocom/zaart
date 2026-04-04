@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 import ProductForm from '@/components/admin/ProductForm';
+import type { Product } from '@/lib/db';
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,7 +12,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   return (
     <div>
       <h1 className="font-display text-3xl font-bold text-wood-900 mb-8">Edit Product</h1>
-      <ProductForm product={data} />
+      <ProductForm product={data as Product} />
     </div>
   );
 }
