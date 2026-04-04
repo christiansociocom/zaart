@@ -8,7 +8,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sb = createSupabaseServerClient();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -17,7 +17,7 @@ export default async function AdminLayout({
 
   async function signOut() {
     'use server';
-    const sb = createSupabaseServerClient();
+    const sb = await createSupabaseServerClient();
     await sb.auth.signOut();
     redirect('/auth/login');
   }

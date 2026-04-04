@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/admin';
 
   if (code) {
-    const sb = createSupabaseServerClient();
+    const sb = await createSupabaseServerClient();
     const { error } = await sb.auth.exchangeCodeForSession(code);
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);

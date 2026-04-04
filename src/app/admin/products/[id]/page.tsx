@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server';
 import ProductForm from '@/components/admin/ProductForm';
 
 export default async function EditProductPage({ params }: { params: { id: string } }) {
-  const sb = createSupabaseServerClient();
+  const sb = await createSupabaseServerClient();
   const { data } = await sb.from('products').select('*').eq('id', params.id).single();
   if (!data) notFound();
 

@@ -26,7 +26,12 @@ export default function ProductCard({ product }: Props) {
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl">🪵</div>
+          <div className="w-full h-full flex items-center justify-center bg-wood-100">
+            {/* Replace /icons/placeholder-product.png with your own placeholder */}
+            <div className="relative w-16 h-16">
+              <Image src="/icons/placeholder-product.png" alt="No image" fill className="object-contain opacity-40" />
+            </div>
+          </div>
         )}
         {product.featured && (
           <span className="absolute top-3 left-3 badge">Featured</span>
