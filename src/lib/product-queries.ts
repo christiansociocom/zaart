@@ -1,8 +1,8 @@
-import { createSupabaseServerClient } from './supabase-server';
+import { createSupabaseAnonClient } from './supabase-server';
 import type { Product, Category } from './db';
 
 export async function getAllProducts(): Promise<Product[]> {
-  const sb = await createSupabaseServerClient();
+  const sb = createSupabaseAnonClient();
   const { data, error } = await sb
     .from('products')
     .select('*')
@@ -12,7 +12,7 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
-  const sb = await createSupabaseServerClient();
+  const sb = createSupabaseAnonClient();
   const { data, error } = await sb
     .from('products')
     .select('*')
@@ -24,7 +24,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const sb = await createSupabaseServerClient();
+  const sb = createSupabaseAnonClient();
   const { data, error } = await sb
     .from('products')
     .select('*')
@@ -35,7 +35,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 }
 
 export async function getProductsByCategory(cat: Category): Promise<Product[]> {
-  const sb = await createSupabaseServerClient();
+  const sb = createSupabaseAnonClient();
   const { data, error } = await sb
     .from('products')
     .select('*')
