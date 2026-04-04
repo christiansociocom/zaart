@@ -23,6 +23,19 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   return data as Product[];
 }
 
+/** Homepage grid: featured items first, then newest — so uploads show even if not starred. */
+export async function getHomepageProducts(limit = 8): Promise<Product[]> {
+  const sb = createSupabaseAnonClient();
+  const { data, error } = await sb
+    .from('products')
+    .select('*')
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data as Product[];
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const sb = createSupabaseAnonClient();
   const { data, error } = await sb

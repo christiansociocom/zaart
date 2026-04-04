@@ -36,15 +36,35 @@ alter table products enable row level security;
 create policy "Public read products"
   on products for select using (true);
 
--- Only authenticated users whose email matches the env var can write.
--- NOTE: set NEXT_PUBLIC_SELLER_EMAIL in your .env so the check works.
--- We use a helper function so the email is never exposed to the client.
-create or replace function is_seller()
-returns boolean language plpgsql security definer as $$
-begin
-  return (auth.email() = current_setting('app.seller_email', true));
-end;
+-- Seller emails allowed to insert/update/delete (Google OAuth JWT email).
+-- Postgres session settings are NOT set by Supabase from Next.js env vars — do not use
+-- current_setting('app.seller_email') for RLS; it stays empty and blocks all writes.
+create table if not exists seller_allowlist (
+  email text primary key
+);
+
+alter table seller_allowlist enable row level security;
+-- No policies: clients cannot read or modify the list; only SQL editor / service role.
+
+create or replace function public.is_seller()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.seller_allowlist sa
+    where lower(sa.email) = lower(trim(coalesce((auth.jwt() ->> 'email'), '')))
+  );
 $$;
+
+revoke all on function public.is_seller() from public;
+grant execute on function public.is_seller() to authenticated;
+
+-- After running this file, add your Google sign-in email once (Supabase SQL editor):
+--   insert into public.seller_allowlist (email) values ('you@gmail.com');
 
 create policy "Seller insert"
   on products for insert with check (is_seller());

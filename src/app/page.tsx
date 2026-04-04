@@ -1,48 +1,43 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getFeaturedProducts } from '@/lib/product-queries';
+import { getHomepageProducts } from '@/lib/product-queries';
 import ProductCard from '@/components/ui/ProductCard';
+import HeroCarousel from '@/components/ui/HeroCarousel';
+import { HERO_CAROUSEL_SLIDES } from '@/lib/hero-carousel';
 import { generalWhatsAppLink } from '@/lib/db';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts();
+  const homepageProducts = await getHomepageProducts(8);
 
   return (
     <>
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-wood-800 via-wood-700 to-bark-700 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-wood-300 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-56 h-56 bg-bark-300 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-4xl mx-auto px-4 py-20 md:py-28 text-center">
-          {/* Replace /icons/hero-wood.png with your own hero illustration */}
-          <div className="w-20 h-20 mx-auto mb-6 relative">
-            <Image src="/icons/hero-wood.png" alt="Handcrafted wood" fill className="object-contain" />
-          </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold leading-tight mb-4">
+      <section className="relative min-h-[420px] md:min-h-[520px] text-white overflow-hidden flex items-center">
+        <HeroCarousel slides={HERO_CAROUSEL_SLIDES} />
+        <div className="absolute inset-0 bg-gradient-to-t from-bark-900/90 via-wood-900/55 to-wood-900/35 z-[2]" aria-hidden />
+        <div className="relative z-[3] max-w-4xl mx-auto px-4 py-20 md:py-28 text-center w-full">
+          <h1 className="font-display text-4xl md:text-6xl font-bold leading-tight mb-4 drop-shadow-md">
             Handcrafted Wooden<br />
             Furniture &amp; Home Accessories
           </h1>
-          <p className="text-wood-200 text-lg md:text-xl mb-2 max-w-2xl mx-auto">
+          <p className="text-white/95 text-lg md:text-xl mb-2 max-w-2xl mx-auto drop-shadow">
             Beautiful pieces made by hand — right here in Tanzania.
           </p>
-          <p className="text-wood-300 text-base mb-10 max-w-xl mx-auto italic">
+          <p className="text-white/85 text-base mb-10 max-w-xl mx-auto italic drop-shadow">
             Bidhaa za mbao zilizotengenezwa kwa mikono, kwa ubora wa kweli.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/products" className="btn-primary text-base px-8 py-4 bg-white text-wood-800 hover:bg-wood-50">
+            <Link href="/products" className="btn-primary text-base px-8 py-4 bg-white text-wood-800 hover:bg-wood-50 shadow-lg">
               View Products
             </Link>
             <a
               href={generalWhatsAppLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-whatsapp text-base px-8 py-4"
+              className="btn-whatsapp text-base px-8 py-4 shadow-lg"
             >
               <WAIcon />
               Order on WhatsApp
@@ -96,17 +91,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURED PRODUCTS ────────────────────────────────────── */}
-      {featured.length > 0 && (
+      {/* ── PRODUCTS (featured first, then newest) ───────────────── */}
+      {homepageProducts.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 pb-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="section-heading">Featured Products</h2>
-            <Link href="/products" className="btn-outline text-sm px-5 py-2.5">
+          <div className="flex items-center justify-between mb-2 gap-4 flex-wrap">
+            <h2 className="section-heading">Shop our collection</h2>
+            <Link href="/products" className="btn-outline text-sm px-5 py-2.5 shrink-0">
               View All →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featured.map(p => (
+          <p className="text-bark-600 text-sm mb-8 max-w-2xl">
+            Starred items appear first; everything you add in admin shows here automatically.
+            Use &quot;Featured&quot; on a product to pin it to the top.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {homepageProducts.map(p => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CldUploadWidget } from 'next-cloudinary';
 import Image from 'next/image';
+import { revalidatePublicCatalog } from '@/app/admin/revalidate';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/db';
 import type { Product, PriceVariant, Category } from '@/lib/db';
@@ -60,6 +61,7 @@ export default function ProductForm({ product }: Props) {
       : await supabase.from('products').insert({ ...payload, created_at: new Date().toISOString() });
     setSaving(false);
     if (err) { setError(err.message); return; }
+    await revalidatePublicCatalog();
     router.push('/admin');
     router.refresh();
   }
@@ -67,7 +69,10 @@ export default function ProductForm({ product }: Props) {
   async function handleDelete() {
     if (!confirm('Delete this product? This cannot be undone.')) return;
     setDeleting(true);
-    await supabase.from('products').delete().eq('id', product!.id);
+    const { error: delErr } = await supabase.from('products').delete().eq('id', product!.id);
+    setDeleting(false);
+    if (delErr) return;
+    await revalidatePublicCatalog();
     router.push('/admin');
     router.refresh();
   }
