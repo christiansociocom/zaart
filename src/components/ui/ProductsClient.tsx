@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { CATEGORIES } from '@/lib/db';
 import type { Product, Category } from '@/lib/db';
