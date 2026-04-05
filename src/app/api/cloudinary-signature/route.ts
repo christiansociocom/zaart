@@ -11,15 +11,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { paramsToSign } = body;
 
-    const signature = cloudinary.utils.sign_request(
-      {
-        ...paramsToSign,
-        folder: 'zaart_assets',
-        use_filename: true,
-        unique_filename: false,
-      },
-      process.env.CLOUDINARY_API_SECRET
-    );
+    const signature = cloudinary.utils.sign_request({
+      ...paramsToSign,
+      folder: 'zaart_assets',
+      use_filename: true,
+      unique_filename: false,
+    });
 
     return Response.json({
       signature: signature.signature,
