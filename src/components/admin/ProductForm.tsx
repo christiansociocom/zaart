@@ -20,6 +20,7 @@ export default function ProductForm({ product }: Props) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
   const [name, setName] = useState(product?.name ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
@@ -46,10 +47,19 @@ export default function ProductForm({ product }: Props) {
   async function handleSave() {
     setError('');
     if (!name || !slug || !price) { setError('Name, slug, and price are required.'); return; }
+    if (images.length === 0) { setError('Please upload at least one product image.'); return; }
     setSaving(true);
     
-    // ✅ Ensure images is always an array
-    const imagesArray = Array.isArray(images) && images.length > 0 ? images : [];
+    // ✅ FIX 1: Validate images are real URLs
+    const imagesArray = Array.isArray(images) && images.length > 0 
+      ? images.filter(img => img && img.trim() && img.startsWith('http')) 
+      : [];
+    
+    if (imagesArray.length === 0) { 
+      setSaving(false);
+      setError('No valid product images found. Please re-upload images.'); 
+      return; 
+    }
     
     const payload = {
       name, slug, category,
@@ -130,29 +140,74 @@ export default function ProductForm({ product }: Props) {
         </Field>
 
         {/* Images */}
-        <Field label="Images" hint="Upload product photos via Cloudinary">
+        <Field label="Images *" hint={`Upload product photos via Cloudinary (${images.length} uploaded)`}>
           <div className="flex flex-wrap gap-3 mb-3">
             {images.map((img, i) => (
-              <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border border-sand">
-                <Image src={img} alt="" fill className="object-cover" />
-                <button onClick={() => setImages(images.filter((_, idx) => idx !== i))}
-                  className="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">✕</button>
+              <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border border-sand bg-wood-50">
+                {img ? (
+                  <>
+                    <Image src={img} alt={`Product ${i}`} fill className="object-cover" />
+                    <button 
+                      onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center transition"
+                    >✕</button>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-2xl">⏳</div>
+                )}
               </div>
             ))}
           </div>
+
           <CldUploadWidget
-            uploadPreset="zaart_products"
+            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET || 'zaart_products'}
             onSuccess={(result: any) => {
-              const url = result?.info?.secure_url;
-              if (url) setImages(prev => [...prev, url]);
+              try {
+                const url = result?.info?.secure_url;
+                console.log('✅ Image uploaded:', url);
+                // ✅ FIX 2: Validate URL before saving
+                if (url && typeof url === 'string' && url.startsWith('http')) {
+                  setImages(prev => [...prev, url]);
+                  setUploadingIndex(null);
+                } else {
+                  setError('Invalid image URL received. Please try again.');
+                  console.error('Invalid URL:', url);
+                }
+              } catch (err) {
+                setError('Error processing uploaded image.');
+                console.error('Upload error:', err);
+              }
+            }}
+            onError={(error: any) => {
+              // ✅ FIX 3: Show error messages to user
+              console.error('❌ Cloudinary upload error:', error);
+              setError(`Upload failed: ${error?.message || 'Unknown error'}. Check your Cloudinary configuration.`);
+              setUploadingIndex(null);
+            }}
+            onOpen={() => {
+              // ✅ FIX 4: Show upload state
+              setUploadingIndex(images.length);
+            }}
+            onClose={() => {
+              setUploadingIndex(null);
             }}
           >
             {({ open }) => (
-              <button onClick={() => open()} className="btn-outline text-sm px-4 py-2">
-                📷 Upload Image
+              <button 
+                type="button"
+                onClick={() => open()} 
+                disabled={uploadingIndex !== null}
+                className="btn-outline text-sm px-4 py-2 disabled:opacity-50"
+              >
+                {uploadingIndex !== null ? '⏳ Uploading...' : '📷 Upload Image'}
               </button>
             )}
           </CldUploadWidget>
+
+          {images.length === 0 && (
+            <p className="text-red-500 text-sm mt-2">⚠️ At least one image is required</p>
+          )}
         </Field>
 
         {/* Featured */}
@@ -164,7 +219,7 @@ export default function ProductForm({ product }: Props) {
 
         {/* Actions */}
         <div className="flex gap-3 pt-4">
-          <button onClick={handleSave} disabled={saving} className="btn-primary px-8 py-4 disabled:opacity-60">
+          <button onClick={handleSave} disabled={saving || images.length === 0} className="btn-primary px-8 py-4 disabled:opacity-60">
             {saving ? 'Saving…' : isEdit ? '💾 Save Changes' : '✅ Create Product'}
           </button>
           <button onClick={() => router.back()} className="btn-outline px-6 py-4">Cancel</button>
