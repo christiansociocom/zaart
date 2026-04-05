@@ -9,14 +9,17 @@ cloudinary.config({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { callback, paramsToSign } = body;
+    const { paramsToSign } = body;
 
-    const signature = cloudinary.utils.build_upload_params({
-      ...paramsToSign,
-      folder: 'zaart_assets',
-      use_filename: true,
-      unique_filename: false,
-    });
+    const signature = cloudinary.utils.sign_request(
+      {
+        ...paramsToSign,
+        folder: 'zaart_assets',
+        use_filename: true,
+        unique_filename: false,
+      },
+      process.env.CLOUDINARY_API_SECRET
+    );
 
     return Response.json({
       signature: signature.signature,
