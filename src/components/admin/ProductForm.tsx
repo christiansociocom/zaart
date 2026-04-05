@@ -50,7 +50,6 @@ export default function ProductForm({ product }: Props) {
     if (images.length === 0) { setError('Please upload at least one product image.'); return; }
     setSaving(true);
     
-    // ✅ FIX 1: Validate images are real URLs
     const imagesArray = Array.isArray(images) && images.length > 0 
       ? images.filter(img => img && img.trim() && img.startsWith('http')) 
       : [];
@@ -161,12 +160,12 @@ export default function ProductForm({ product }: Props) {
           </div>
 
           <CldUploadWidget
-            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET || 'zaart_products'}
+            uploadPreset="zaart_products"
+            signatureEndpoint="/api/cloudinary-signature"
             onSuccess={(result: any) => {
               try {
                 const url = result?.info?.secure_url;
                 console.log('✅ Image uploaded:', url);
-                // ✅ FIX 2: Validate URL before saving
                 if (url && typeof url === 'string' && url.startsWith('http')) {
                   setImages(prev => [...prev, url]);
                   setUploadingIndex(null);
@@ -180,13 +179,11 @@ export default function ProductForm({ product }: Props) {
               }
             }}
             onError={(error: any) => {
-              // ✅ FIX 3: Show error messages to user
               console.error('❌ Cloudinary upload error:', error);
               setError(`Upload failed: ${error?.message || 'Unknown error'}. Check your Cloudinary configuration.`);
               setUploadingIndex(null);
             }}
             onOpen={() => {
-              // ✅ FIX 4: Show upload state
               setUploadingIndex(images.length);
             }}
             onClose={() => {
