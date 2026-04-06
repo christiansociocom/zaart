@@ -44,7 +44,13 @@ export default function ProductForm({ product }: Props) {
   }
 
   async function handleSave() {
-    setError('');
+
+
+     try {
+    // ... existing code
+
+
+     setError('');
     if (!name || !slug || !price) { setError('Name, slug, and price are required.'); return; }
     if (images.length === 0) { setError('Please upload at least one product image.'); return; }
     setSaving(true);
@@ -76,9 +82,27 @@ export default function ProductForm({ product }: Props) {
     await fetch('/api/revalidate', { method: 'POST' });
     router.push('/admin');
     router.refresh();
+
+
+       
+  } catch (err: any) {
+    setError('JS Error: ' + (err?.message || String(err)));
+     }
+
+    
+    
+    
   }
 
   async function handleDelete() {
+
+
+
+    try {
+    // ... existing code
+
+
+
     if (!confirm('Delete this product? This cannot be undone.')) return;
     setDeleting(true);
     const { error: delErr } = await supabase.from('products').delete().eq('id', product!.id);
@@ -87,6 +111,18 @@ export default function ProductForm({ product }: Props) {
     await fetch('/api/revalidate', { method: 'POST' });
     router.push('/admin');
     router.refresh();
+
+
+
+      
+  } catch (err: any) {
+    setError('JS Error: ' + (err?.message || String(err)));
+    }
+
+
+
+    
+    
   }
 
   return (
