@@ -44,85 +44,61 @@ export default function ProductForm({ product }: Props) {
   }
 
   async function handleSave() {
+    try {
+      setError('');
+      if (!name || !slug || !price) { setError('Name, slug, and price are required.'); return; }
+      if (images.length === 0) { setError('Please upload at least one product image.'); return; }
+      setSaving(true);
 
+      const imagesArray = Array.isArray(images) && images.length > 0
+        ? images.filter(img => img && img.trim() && img.startsWith('http'))
+        : [];
 
-     try {
-    // ... existing code
+      if (imagesArray.length === 0) {
+        setSaving(false);
+        setError('No valid product images found. Please re-upload images.');
+        return;
+      }
 
+      const payload = {
+        name, slug, category,
+        price: Number(price),
+        description,
+        featured,
+        images: imagesArray,
+        price_variants: variants.length > 0 ? variants : null,
+        updated_at: new Date().toISOString(),
+      };
 
-     setError('');
-    if (!name || !slug || !price) { setError('Name, slug, and price are required.'); return; }
-    if (images.length === 0) { setError('Please upload at least one product image.'); return; }
-    setSaving(true);
-    
-    const imagesArray = Array.isArray(images) && images.length > 0 
-      ? images.filter(img => img && img.trim() && img.startsWith('http')) 
-      : [];
-    
-    if (imagesArray.length === 0) { 
+      const { error: err } = isEdit
+        ? await supabase.from('products').update(payload).eq('id', product!.id)
+        : await supabase.from('products').insert({ ...payload, created_at: new Date().toISOString() });
+
       setSaving(false);
-      setError('No valid product images found. Please re-upload images.'); 
-      return; 
+      if (err) { setError(err.message); return; }
+      await fetch('/api/revalidate', { method: 'POST' });
+      router.push('/admin');
+      router.refresh();
+    } catch (err: any) {
+      setSaving(false);
+      setError('JS Error: ' + (err?.message || String(err)));
     }
-    
-    const payload = {
-      name, slug, category,
-      price: Number(price),
-      description,
-      featured,
-      images: imagesArray,
-      price_variants: variants.length > 0 ? variants : null,
-      updated_at: new Date().toISOString(),
-    };
-    const { error: err } = isEdit
-      ? await supabase.from('products').update(payload).eq('id', product!.id)
-      : await supabase.from('products').insert({ ...payload, created_at: new Date().toISOString() });
-    setSaving(false);
-    if (err) { setError(err.message); return; }
-    await fetch('/api/revalidate', { method: 'POST' });
-    router.push('/admin');
-    router.refresh();
-
-
-       
-  } catch (err: any) {
-    setError('JS Error: ' + (err?.message || String(err)));
-     }
-
-    
-    
-    
   }
 
   async function handleDelete() {
-
-
-
     try {
-    // ... existing code
-
-
-
-    if (!confirm('Delete this product? This cannot be undone.')) return;
-    setDeleting(true);
-    const { error: delErr } = await supabase.from('products').delete().eq('id', product!.id);
-    setDeleting(false);
-    if (delErr) return;
-    await fetch('/api/revalidate', { method: 'POST' });
-    router.push('/admin');
-    router.refresh();
-
-
-
-      
-  } catch (err: any) {
-    setError('JS Error: ' + (err?.message || String(err)));
+      if (!confirm('Delete this product? This cannot be undone.')) return;
+      setDeleting(true);
+      const { error: delErr } = await supabase.from('products').delete().eq('id', product!.id);
+      setDeleting(false);
+      if (delErr) { setError(delErr.message); return; }
+      await fetch('/api/revalidate', { method: 'POST' });
+      router.push('/admin');
+      router.refresh();
+    } catch (err: any) {
+      setDeleting(false);
+      setError('JS Error: ' + (err?.message || String(err)));
     }
-
-
-
-    
-    
   }
 
   return (
@@ -181,7 +157,7 @@ export default function ProductForm({ product }: Props) {
                 {img ? (
                   <>
                     <Image src={img} alt={`Product ${i}`} fill className="object-cover" />
-                    <button 
+                    <button
                       onClick={() => setImages(images.filter((_, idx) => idx !== i))}
                       type="button"
                       className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center transition"
@@ -200,35 +176,27 @@ export default function ProductForm({ product }: Props) {
             onSuccess={(result: any) => {
               try {
                 const url = result?.info?.secure_url;
-                console.log('✅ Image uploaded:', url);
                 if (url && typeof url === 'string' && url.startsWith('http')) {
                   setImages(prev => [...prev, url]);
                   setUploadingIndex(null);
                 } else {
                   setError('Invalid image URL received. Please try again.');
-                  console.error('Invalid URL:', url);
                 }
               } catch (err) {
                 setError('Error processing uploaded image.');
-                console.error('Upload error:', err);
               }
             }}
             onError={(error: any) => {
-              console.error('❌ Cloudinary upload error:', error);
               setError(`Upload failed: ${error?.message || 'Unknown error'}. Check your Cloudinary configuration.`);
               setUploadingIndex(null);
             }}
-            onOpen={() => {
-              setUploadingIndex(images.length);
-            }}
-            onClose={() => {
-              setUploadingIndex(null);
-            }}
+            onOpen={() => { setUploadingIndex(images.length); }}
+            onClose={() => { setUploadingIndex(null); }}
           >
             {({ open }) => (
-              <button 
+              <button
                 type="button"
-                onClick={() => open()} 
+                onClick={() => open()}
                 disabled={uploadingIndex !== null}
                 className="btn-outline text-sm px-4 py-2 disabled:opacity-50"
               >
