@@ -1,7 +1,12 @@
 import { notFound } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
-import ProductForm from '@/components/admin/ProductForm';
+import dynamic from 'next/dynamic';
 import type { Product } from '@/lib/db';
+
+const ProductForm = dynamic(
+  () => import('@/components/admin/ProductForm'),
+  { ssr: false }
+);
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
