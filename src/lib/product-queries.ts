@@ -1,4 +1,4 @@
-import { createSupabaseAnonClient } from './supabase-server';
+import { createSupabaseAnonClient } from './supabase-anon';
 import type { Product, Category } from './db';
 
 export async function getAllProducts(): Promise<Product[]> {
