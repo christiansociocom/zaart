@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -17,6 +18,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <Script 
+          src="https://upload.cloudinary.com/pages/cloudinary_js/2.0/cloudinary-core.min.js" 
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
