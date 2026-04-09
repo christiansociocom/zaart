@@ -1,17 +1,16 @@
-import dynamic from 'next/dynamic';
+import React from 'react';
+import ErrorBoundary from 'path-to-error-boundary';
+import Debugger from 'path-to-debugger';
+import ProductForm from './ProductForm';
 
-const ProductForm = dynamic(
-  () => import('@/components/admin/ProductForm'),
-  { ssr: false }
-);
-
-export default function NewProductPage() {
+const NewProductPage = () => {
   return (
-    <div>
-      <h1 className="font-display text-3xl font-bold text-wood-900 mb-8">
-        Add New Product
-      </h1>
-      <ProductForm />
-    </div>
+    <ErrorBoundary>
+      <Debugger>
+        <ProductForm />
+      </Debugger>
+    </ErrorBoundary>
   );
-}
+};
+
+export default NewProductPage;
